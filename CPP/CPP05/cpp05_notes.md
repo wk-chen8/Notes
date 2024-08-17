@@ -97,7 +97,7 @@ try {
 }
 catch (int a) { }
 catch (char b) { }
-catch (...) { } // catches all kinds of exception (not a good practice)
+catch (...) { } // catches all kinds of exception (not a good practice unless it is in main() to ensure cleanup and no stray exceptions are left uncaught).
 ```
 
 <ol start="6">
@@ -117,6 +117,20 @@ try {
 }
 catch (int b) { } // handling in external level instead
 ```
+
+<ol start="7">
+	<li>
+		Exceptions are handled by <code>stack unwinding</code>. When an exception occurs, the program will first check whether it can be handled in the current function (if the <code>try-catch</code> block is within the current function). If not, the program next checks whether the function's caller (next function up the call stack) can handle the exception. And if not again, it keeps going up the call stack until a handler is found, thereby "unwinding" the stack frame. <code>Stack unwinding</code> invokes the destructors for every fully constructed object so that they are properly destroyed. However, this can be implementation-defined so in some systems the destructors are not invoked. This is to preserve data for things like debugging.
+		<ul>
+			<li>
+				If no matching handler is found, the program will be terminated with <code>std::terminate()</code>.
+			</li>
+			<li>
+				If a matching handler is found, the program will continue from that point (remember that all data between the point where exception is thrown and the handler is lost).
+			</li>
+		</ul>
+	</li>
+</ol>
 
 <h3>Exception Specifications (Deprecated)</h3>
 <ol>
@@ -206,7 +220,7 @@ class exception {
 		virtual ~exception() throw();
 		virtual const char	*what() const throw();
 };
-// As both the destructor and what() are declared as virtual and non-throwing, and if we were to override these functions in the derived class, the standard requires that the overriden functions must have the same restrictions or be more restrictive, not less.
+// As both the destructor and what() are declared as virtual and non-throwing, and if we were to override these functions in the derived class, the standard requires that the overriden functions must have the same restrictions or be more restrictive, not less. This is because the compiler will decide whether it should handle exceptions during compile time, mainly by examining the function signatures, and it is unable to determine which function to run until runtime (where dynamic binding of the correct function by lookup of virtual table occurs).
 
 // Having the same restriction level or more between the base and derived class is known as the "Liskov Substitution Principle", which states that the subclasses should behave in the same way as the objects of superclass (without breaking the application of superclass). This principle can also be applied generally.
 ```
