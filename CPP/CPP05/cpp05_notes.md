@@ -166,6 +166,47 @@ double	func(char arg) throw(int);
 <h3>Standard Exceptions</h3>
 <ol>
 	<li>
-		
+		As mentioned earlier, we can throw class objects. <i>C++</i> provides a base class specifically designed to declare objects to be thrown as exceptions. It is called <code>std::exception</code> and is defined in the <code>&lt;exception&gt;</code>. This class has a virtual member function called <code>what()</code> that returns a <code>char *</code> and that can be overwritten/overloaded in derived classes to contain some sort of description of the exception.
 	</li>
 </ol>
+
+```c++
+class A : public std::exception {
+	public:
+		virtual const char *what() const throw() {
+			return ("Exception thrown");
+		}
+};
+
+int main(void) {
+	try {
+		throw A();
+	}
+	catch (const std::exception &e) {
+		std::cout << e.what() std::endl;
+	}
+}
+// The exception is caught in the catch block by reference. This is a good practice as the exception is not recreated again which saves on memory.
+
+// As the user-defined exception inherits std::exception, other classes derived from std::exception (such as std::bad_alloc, std::bad_cast etc.) will also be caught (think subtyping polymorphism). If we pass by value of a base class but our exception is from the derived class, this would not work properly. Also if we do not want such a general catch, we can specify the class object itself (e.g. catch (const A &e)).
+```
+
+<ol start="2">
+	<li>
+		The <code>std::exception</code> class is declared as:
+	</li>
+</ol>
+
+```c++
+class exception {
+	public:
+		exception(void) throw();
+		exception(const exception &) throw();
+		exception	&operator=(const exception &) throw();
+		virtual ~exception() throw();
+		virtual const char	*what() const throw();
+};
+// As both the destructor and what() are declared as virtual and non-throwing, and if we were to override these functions in the derived class, the standard requires that the overriden functions must have the same restrictions or be more restrictive, not less.
+
+// Having the same restriction level or more between the base and derived class is known as the "Liskov Substitution Principle", which states that the subclasses should behave in the same way as the objects of superclass (without breaking the application of superclass). This principle can also be applied generally.
+```
