@@ -64,7 +64,7 @@
 	<li>Ray-Sphere Intersection</li>
 	<li>Hits</li>
 	<li>Transforming Rays and Objects</li>
-	<li>World Space vs. Object Space</li>
+	<li>Coordinate Systems/Spaces (World Space vs. Object Space)</li>
 </ol>
 
 <h3>Chapter 6: Light and Shading</h3>
